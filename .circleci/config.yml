@@ -81,9 +81,9 @@ jobs:
       # Your job code here
       - checkout
       - restore_cache:
-          keys: [frontend-build]
+          keys: [frontend-test]
       - run:
-          name: Build front-end
+          name: test front-end
           command: |
             # Your code here
             cd frontend
@@ -100,9 +100,9 @@ jobs:
       # Your job code here
       - checkout
       - restore_cache:
-          keys: [backend-build]
+          keys: [backend-test]
       - run:
-          name: Back-end build
+          name: Back-end test
           command: |
              # Your code here
              cd backend
