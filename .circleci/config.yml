@@ -160,7 +160,7 @@ jobs:
     steps:
       # Checkout code from git
       - checkout
-      - dependencies
+      
       # Checkout code from git
       - run:
           name: Ensure back-end infrastructure exists
