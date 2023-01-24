@@ -119,14 +119,14 @@ jobs:
       # Your job code here
       - checkout
       - restore_cache:
-          keys: [frontend-scan]
+          keys: [build-frontend]
       - run:
           name: scan front-end
           command: |
              # Your code here
              cd frontend
              npm install
-             # npm install oauth-sign@^0.9.0
+             
              npm audit --audit-level=critical
 
   scan-backend:
@@ -137,16 +137,16 @@ jobs:
       # Checkout code from git
       # Restore from cache
       # Your job - checkout
+      - checkout
       - restore_cache:
-          keys: [backend-scan]
+          keys:
+            - build-frontend
       - run:
-          name: Back-end scan
+          name: Scanning backend
           command: |
-             
-             cd backend
-             npm install
-             # npm install oauth-sign@^0.9.0
-             npm audit --audit-level=critical
+            cd backend
+            npm install
+            npm audit fix --audit-level=critical --force
 
 
   # deploy-infrastructure:
