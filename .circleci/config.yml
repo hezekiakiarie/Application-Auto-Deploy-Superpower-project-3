@@ -139,14 +139,15 @@ jobs:
       # Your job - checkout
       - checkout
       - restore_cache:
-          keys:
-            - build-frontend
+          keys: [build-frontend]
       - run:
-          name: Scanning backend
+          name: scan back-end
           command: |
-            cd backend
-            npm install
-            npm audit fix --audit-level=critical 
+             # Your code here
+             cd backend
+             npm install
+             
+             npm audit --audit-level=critical
 
 
   # deploy-infrastructure:
