@@ -79,20 +79,14 @@ jobs:
       - run:
           name: Back-end build
           working_directory: ./backend
-          command: |
-            npm i
+          command:  |
+            cd frontend
+            npm install
             npm run build
-            cp .env dist/.env
-            pwd && ls -al
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/backend/dist
-            - project/backend/node_modules
       - save_cache:
-          key: build-backend
+          key: build-frontend
           paths:
-            - backend/node_modules
+            - frontend/node_module
 
   test-backend:
     docker:
