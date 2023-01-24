@@ -183,81 +183,81 @@ jobs:
       - destroy-environment:
           workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'  
 
-#   configure-infrastructure:
-#     docker:
-#       - image: python:3.7-alpine3.11
-#         environment:
-#           NODE_ENV: "production"
-#           VERSION: "1"
-#           ENVIRONMENT: "production"
-#           TYPEORM_CONNECTION: $TYPEORM_CONNECTION
-#           TYPEORM_HOST: $TYPEORM_HOST
-#           TYPEORM_USERNAME: $TYPEORM_USERNAME
-#           TYPEORM_PASSWORD: $TYPEORM_PASSWORD
-#           TYPEORM_DATABASE: $TYPEORM_DATABASE
-#           TYPEORM_PORT: $TYPEORM_PORT
-#           TYPEORM_ENTITIES: $TYPEORM_ENTITIES
-#     steps:
-#       - checkout
-#       # Add ssh keys with fingerprint
-#       - add_ssh_keys:
-#           fingerprints: ["04:21:ed:89:b7:0c:af:ca:6c:7d:4e:64:48:58:06:3a"]
-#       - attach_workspace:
-#           at: ~/
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             apk add curl
-#             apk add --upgrade bash
-#             apk add --update ansible
-#             apk add openssh-client
-#             pip3 install awscli
-#       - run:
-#           name: Configure server
-#           command: |
-#             cat ~/project/.circleci/ansible/inventory.txt
-#             export ANSIBLE_HOST_KEY_CHECKING=False
-#             ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml    
-#       # - destroy-environment:
-#       #     workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'  
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+        environment:
+          NODE_ENV: "production"
+          VERSION: "1"
+          ENVIRONMENT: "production"
+          TYPEORM_CONNECTION: $TYPEORM_CONNECTION
+          TYPEORM_HOST: $TYPEORM_HOST
+          TYPEORM_USERNAME: $TYPEORM_USERNAME
+          TYPEORM_PASSWORD: $TYPEORM_PASSWORD
+          TYPEORM_DATABASE: $TYPEORM_DATABASE
+          TYPEORM_PORT: $TYPEORM_PORT
+          TYPEORM_ENTITIES: $TYPEORM_ENTITIES
+    steps:
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints: ["04:21:ed:89:b7:0c:af:ca:6c:7d:4e:64:48:58:06:3a"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add curl
+            apk add --upgrade bash
+            apk add --update ansible
+            apk add openssh-client
+            pip3 install awscli
+      - run:
+          name: Configure server
+          command: |
+            cat ~/project/.circleci/ansible/inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml    
+      # - destroy-environment:
+      #     workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'  
 
 
 
-#   run-migrations:
-#     docker:
-#       - image: sleavely/node-awscli:14.x
-#     steps:
-#       - checkout
-#       - restore_cache:
-#           keys:
-#             - build-backend
-#       - run:
-#           name: Run migrations
-#           command: |
-#             cd backend
-#             cat .env
-#             npm i
-#             npm run build
-#             npm run migrations > migrations_dump.txt
-#             cat migrations_dump.txt
+  run-migrations:
+    docker:
+      - image: sleavely/node-awscli:14.x
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - build-backend
+      - run:
+          name: Run migrations
+          command: |
+            cd backend
+            cat .env
+            npm i
+            npm run build
+            npm run migrations > migrations_dump.txt
+            cat migrations_dump.txt
             
-#       - run:
-#           name: Sending migration status to kvdb
-#           command: |
-#             if grep -q "has been executed successfully"  ./backend/migrations_dump.txt   
-#             then
-#               curl https://kvdb.io/LHFkzdfqGQiT5AocazCCLL//migration_${CIRCLE_WORKFLOW_ID:0:7} \
-#                 -H "X-Api-Key: ${THISDB_API_KEY}" \
-#                 -d "1"
-#             else
-#               curl https://kvdb.io/LHFkzdfqGQiT5AocazCCLL//migration_${CIRCLE_WORKFLOW_ID:0:7} \
-#                 -H "X-Api-Key: ${THISDB_API_KEY}" \
-#                 -d "0"
-#             fi
-#   #     - destroy-environment:
-#   #         workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
-#   #     - destroy-environment:
-#   #         workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
+      - run:
+          name: Sending migration status to kvdb
+          command: |
+            if grep -q "has been executed successfully"  ./backend/migrations_dump.txt   
+            then
+              curl https://kvdb.io/LHFkzdfqGQiT5AocazCCLL//migration_${CIRCLE_WORKFLOW_ID:0:7} \
+                -H "X-Api-Key: ${THISDB_API_KEY}" \
+                -d "1"
+            else
+              curl https://kvdb.io/LHFkzdfqGQiT5AocazCCLL//migration_${CIRCLE_WORKFLOW_ID:0:7} \
+                -H "X-Api-Key: ${THISDB_API_KEY}" \
+                -d "0"
+            fi
+  #     - destroy-environment:
+  #         workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
+  #     - destroy-environment:
+  #         workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
 
 #   deploy-frontend:
 #     docker:
@@ -444,8 +444,8 @@ workflows:
           requires: [build-frontend]
       - deploy-infrastructure:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
