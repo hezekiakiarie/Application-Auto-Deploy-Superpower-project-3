@@ -117,18 +117,17 @@ jobs:
       # Checkout code from git
       # Restore from cache
       # Your job code here
+      
       - checkout
       - restore_cache:
-          keys: [build-frontend]
+          keys:
+            - build-frontend
       - run:
-          name: scan front-end
+          name: Scanning frontend
           command: |
-             # Your code here
-             cd frontend
-             npm install
-             
-             npm audit --audit-level=critical --force
-
+            cd frontend
+            npm install
+            npm audit fix --audit-level=critical --force
   scan-backend:
     docker:
       # Docker image here
@@ -137,18 +136,17 @@ jobs:
       # Checkout code from git
       # Restore from cache
       # Your job - checkout
+      
       - checkout
       - restore_cache:
-          keys: [build-frontend]
+          keys:
+            - build-frontend
       - run:
-          name: scan back-end
+          name: Scanning backend
           command: |
-             # Your code here
-             cd backend
-             npm install
-             
-             npm audit --audit-level=critical --force
-
+            cd backend
+            npm install
+            npm audit fix --audit-level=critical --force
 
   # deploy-infrastructure:
   #   docker:
