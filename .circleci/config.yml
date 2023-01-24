@@ -88,6 +88,7 @@ jobs:
           command: |
             # Your code here
             cd frontend
+            788765
             npm install
             npm run test
       - slack/notify:
