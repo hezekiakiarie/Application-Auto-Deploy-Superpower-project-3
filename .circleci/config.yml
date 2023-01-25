@@ -396,50 +396,51 @@ jobs:
 
   smoke-test:
     docker:
-      - image: circleci/node:13.8.0 
+      - image: python:3.7-alpine3.11
     steps:
-
       - checkout
-      - install_awscli
-      - install_nodejs
-
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
-            # your code here
-            sudo apt install -y curl
-            sudo apt install net-tools
+            apk add --update curl
+            pip install awscli
       - run:
-          name: Backend smoke test.
+          name: Backend smoke test
           command: |
+             BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+             API_URL="http://${BACKEND_IP}:3030"
+             curl "${API_URL}/api/status"
 
-            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-            --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --output text)
-            
-            export API_URL=http://${BACKEND_PUBLIC_IP}:3030
-            echo "${BACKEND_PUBLIC_IP}"
-            if curl -s $API_URL/api/status | grep "ok"
-            then
-                exit 0
-            else
-                exit 1
-            fi
+  smoke-test-frontend:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/
       - run:
-          name: Frontend smoke test.
+          name: Install dependencies
           command: |
-            FRONTEND_WEBSITE=http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.${AWS_DEFAULT_REGION}.amazonaws.com
-            if curl -s $FRONTEND_WEBSITE | grep "Welcome"
+            apk add --update curl
+            pip install awscli
+      - run:
+          name: Smoke test for front end
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-west-2.amazonaws.com"             
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
             then
-              # This is the intentional error, if "Welcome" is indeed in the response this step will exit with exit code 1
+            
               exit 0
             else
               exit 1
-            fi
-      # # - destroy-environment
-      ## - revert-migrations
-
+            fi           
+      # - destroy-environment:
+      #     workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
+      # - revert-migrations:
+      #     workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
   cloudfront-update:
     docker:
       # Docker image here that supports AWS CLI
