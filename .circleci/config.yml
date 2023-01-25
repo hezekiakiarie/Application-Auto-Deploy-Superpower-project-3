@@ -489,7 +489,7 @@ jobs:
     steps:
       - checkout
       #- install_awscli
-      - install_nodejs
+      #- install_nodejs
       - run:
           name: Remove old stacks and files
           command: |
