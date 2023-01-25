@@ -227,32 +227,43 @@ jobs:
 
   run-migrations:
     docker:
-      - image: sleavely/node-awscli:14.x
+      # Docker image here that supports NodeJS
+      - image: python:3.10-alpine3.16
     steps:
-      - checkout
+      # Checkout code from git
+      - checkout 
+      
+      - run:
+           name: install deps
+           command: |
+              apk add --update --no-cache tar gzip nodejs npm aws-cli curl
       - restore_cache:
-          keys:
-            - build-backend
+          keys: [backend-build]
+
+      - create-dotenv-file
+
       - run:
           name: Run migrations
           command: |
+            # Your code here
             cd backend
-            
-            npm i
+            npm install
             npm run build
-            npm run migrations > migrations_dump.txt
-            #cat migrations_dump.txt
-            
+            npm run migrations >> migrations_dump.txt
+            ls -la
+            cat migrations_dump.txt
       - run:
-          name: Sending migration status to kvdb
+          name: Send migration results to memstash
           command: |
-           if grep -q "has been executed successfully." ~/project/backend/migrations_dump.txt
-           then
-             # If you are using memstash.io, generate the token "24f2sx439n69pKN1PALPXs" on the website
-             curl -H "Content-Type: text/plain" -H "token: 24f2sx439n69pKN1PALPXs" --request PUT --data "1" https://api.memstash.io/values/migration_${CIRCLE_WORKFLOW_ID:0:7}
-             # If you are using kvdb.io, generate the bucket ID "9GE4jRtKznmVKRfvdBABBe" in your local terminal first
-             curl https://kvdb.io/9GE4jRtKznmVKRfvdBABBe/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-           fi
+            # Your code here
+            if grep -q "migrations" ~/project/backend/migrations_dump.txt
+            then
+              curl --insecure https://kvdb.io/24f2sx439n69pKN1PALPXs/migration_${CIRCLE_WORKFLOW_ID:0:7} -d '1'
+            fi
+      
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment: 
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
   #     - destroy-environment:
   #         workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
   #     - destroy-environment:
