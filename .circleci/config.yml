@@ -323,7 +323,7 @@ jobs:
             # your code here
             cd backend
             npm install
-            npm audit fix --audit-level=critical --force
+            #npm audit fix --audit-level=critical --force
             npm run build
             cd ..
             tar -C backend -czvf artifact.tar.gz .
