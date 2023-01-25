@@ -240,7 +240,7 @@ jobs:
       # Add ssh keys with fingerprint
       - add_ssh_keys:
           fingerprints:
-            - "d2:f5:3c:5a:b8:50:b1:e1:ea:a2:4c:9a:27:9f:d3:0b"
+            - "81:fc:3a:b5:d4:68:fb:99:89:9d:33:5a:ce:90:27:fc"
       # attach workspace
       - attach_workspace:
           at:  ~/
@@ -362,7 +362,7 @@ jobs:
       # Add ssh keys with fingerprint
       - add_ssh_keys:
            fingerprints:
-             - 'd2:f5:3c:5a:b8:50:b1:e1:ea:a2:4c:9a:27:9f:d3:0b'
+             - '81:fc:3a:b5:d4:68:fb:99:89:9d:33:5a:ce:90:27:fc'
       # attach workspace
       - attach_workspace:
           at: ~/
@@ -526,8 +526,8 @@ workflows:
           requires: [configure-infrastructure]
       - deploy-frontend:
           requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
