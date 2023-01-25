@@ -299,43 +299,42 @@ jobs:
 
   deploy-backend:
     docker:
-      - image: python:3.7-alpine3.11
-        environment:
-          NODE_ENV: "production"
-          VERSION: "1"
-          ENVIRONMENT: "production"
-          TYPEORM_CONNECTION: $TYPEORM_CONNECTION
-          TYPEORM_HOST: $TYPEORM_HOST
-          TYPEORM_USERNAME: $TYPEORM_USERNAME
-          TYPEORM_PASSWORD: $TYPEORM_PASSWORD
-          TYPEORM_DATABASE: $TYPEORM_DATABASE
-          TYPEORM_PORT: $TYPEORM_PORT
-          TYPEORM_ENTITIES: $TYPEORM_ENTITIES       
+      # Docker image here that supports Ansible
+      - image: python:3.10-alpine3.16
     steps:
-      - checkout
+      # Checkout code from git
+      - checkout 
+      # Add ssh keys with fingerprint
       - add_ssh_keys:
-          fingerprints: ["81:fc:3a:b5:d4:68:fb:99:89:9d:33:5a:ce:90:27:fc"]
-      - attach_workspace: 
+           fingerprints:
+             - '81:fc:3a:b5:d4:68:fb:99:89:9d:33:5a:ce:90:27:fc'
+      # attach workspace
+      - attach_workspace:
           at: ~/
-      - restore_cache:
-          keys:
-            - build-backend
       - run:
           name: Install dependencies
           command: |
-            apk add --update ansible nodejs npm tar gzip
+            # your code here
+            apk add --update --no-cache tar gzip nodejs npm tree aws-cli ansible
+            
       - run:
           name: Deploy backend
           command: |
+            # your code here
             cd backend
             npm install
             npm run build
             cd ..
             tar -C backend -czvf artifact.tar.gz .
-            cat ~/project/.circleci/ansible/inventory.txt
-            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/deploy-backend.yml
-
-      # - destroy-environment:
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+      # Here's where you will add some code to rollback on failure 
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+      - revert-migrations:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7
 
   smoke-test-backend:
     docker:
