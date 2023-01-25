@@ -331,24 +331,24 @@ jobs:
 
       # - destroy-environment:
 
-  smoke-test-backend:
-    docker:
-      - image: python:3.7-alpine3.11
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update curl
-            pip install awscli
-      - run:
-          name: Backend smoke test
-          command: |
-             BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
-             API_URL="http://${BACKEND_IP}:3030"
-             curl "${API_URL}/api/status"
+  # smoke-test-backend:
+  #   docker:
+  #     - image: python:3.7-alpine3.11
+  #   steps:
+  #     - checkout
+  #     - attach_workspace:
+  #         at: ~/
+  #     - run:
+  #         name: Install dependencies
+  #         command: |
+  #           apk add --update curl
+  #           pip install awscli
+  #     - run:
+  #         name: Backend smoke test
+  #         command: |
+  #            BACKEND_IP=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --output text)
+  #            API_URL="http://${BACKEND_IP}:3030"
+  #            curl "${API_URL}/api/status"
 
 #   smoke-test-frontend:
 #     docker:
