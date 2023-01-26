@@ -359,6 +359,11 @@ jobs:
     steps:
       # Checkout code from git
       - checkout 
+      - install_ansible
+      - install_awscli
+      - install_nodejs
+      - restore_cache:
+         keys: [backend-deps]
       # Add ssh keys with fingerprint
       - add_ssh_keys:
            fingerprints:
